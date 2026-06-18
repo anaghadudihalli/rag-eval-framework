@@ -1,0 +1,35 @@
+services:
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: rag-eval-opensearch
+    environment:
+      - cluster.name=rag-eval-cluster
+      - node.name=rag-eval-node1
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      # Disable TLS/auth for local development simplicity
+      - DISABLE_SECURITY_PLUGIN=true
+      # k-NN plugin is included in the standard image — no extra install needed
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+volumes:
+  opensearch-data:
+    driver: local

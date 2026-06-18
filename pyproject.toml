@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=71.0", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "rag-eval-framework"
+version = "0.1.0"
+description = "Automated RAG evaluation and observability pipeline"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Anagha Dudihalli" }]
+
+dependencies = [
+    # LangChain core stack
+    "langchain>=0.3.0",
+    "langchain-community>=0.3.0",
+    "langchain-openai>=0.2.0",
+    # OpenSearch integration (matches EA production stack)
+    "langchain-opensearch>=0.0.2",
+    "opensearch-py>=2.4.0",
+    # Embeddings
+    "sentence-transformers>=2.7.0",
+    # OpenAI (LLM-as-judge + RAG generation)
+    "openai>=1.30.0",
+    # Pydantic v2 — required by LangChain 0.3+
+    "pydantic>=2.7.0",
+    "pydantic-settings>=2.3.0",
+    # Terminal reporting
+    "rich>=13.7.0",
+    # Env management
+    "python-dotenv>=1.0.0",
+    # ChromaDB — fallback vector store when OpenSearch is unavailable
+    "chromadb>=0.5.0",
+    "langchain-chroma>=0.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-mock>=3.14.0",
+    "black>=24.4.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
+    "types-requests",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rag_eval*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+    "unit: fast tests with no external services",
+    "integration: tests requiring Docker or network",
+    "opensearch: tests requiring a live OpenSearch instance",
+]
+log_cli = true
+log_cli_level = "INFO"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "I", "N", "UP", "ANN"]
+ignore = ["ANN101", "ANN102"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+ignore_missing_imports = true
