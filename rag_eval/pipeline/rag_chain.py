@@ -19,9 +19,9 @@ import time
 from langchain_core.documents import Document
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.retrievers import BaseRetriever
-from langchain_openai import ChatOpenAI
 
 from rag_eval.config import get_settings
+from rag_eval.llm_factory import get_chat_model
 
 logger = logging.getLogger(__name__)
 
@@ -71,15 +71,13 @@ class RAGChain:
         self._api_key = api_key or settings.openai_api_key.get_secret_value()
 
         # logprobs=True enables per-token log-probabilities for confidence routing.
-        # top_logprobs=1 fetches the top-1 logprob per token (sufficient for confidence).
-        # Note: logprobs are available on gpt-3.5-turbo-1106 and later.
-        self._llm = ChatOpenAI(
-            model=self._model_name,
-            api_key=self._api_key,
+        # Only supported by OpenAI — Groq silently returns empty logprobs, which
+        # the confidence router handles by falling back to cosine similarity.
+        self._llm = get_chat_model(
+            settings=get_settings(),
             temperature=0.0,
             max_tokens=512,
-            logprobs=True,
-            top_logprobs=1,
+            with_logprobs=True,  # no-op for Groq
         )
 
     def run(self, query: str) -> tuple[str, list[Document], list[float], float]:

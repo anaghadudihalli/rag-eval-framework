@@ -26,6 +26,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from rag_eval.config import get_settings
+from rag_eval.llm_factory import get_chat_model
 from rag_eval.models.results import HallucinationResult
 
 logger = logging.getLogger(__name__)
@@ -73,14 +74,25 @@ class HallucinationEvaluator:
         self._model_name = model_name or settings.judge_model
         self._api_key = api_key or settings.openai_api_key.get_secret_value()
 
-        self._llm = ChatOpenAI(
-            model=self._model_name,
-            api_key=self._api_key,
-            temperature=0.0,  # deterministic judging
-            max_tokens=256,
-            # response_format enforces JSON output — available in gpt-3.5-turbo-1106+
-            model_kwargs={"response_format": {"type": "json_object"}},
-        )
+        # Use the LLM factory so this works with both OpenAI and Groq.
+        # response_format=json_object enforces JSON on OpenAI; Groq relies on
+        # the prompt's instruction ("Return ONLY a JSON object") instead.
+        base_llm = get_chat_model(settings=settings, temperature=0.0, max_tokens=256)
+
+        if settings.llm_provider == "openai":
+            # Rebind with JSON mode for OpenAI (gpt-3.5-turbo-1106+)
+            from langchain_openai import ChatOpenAI
+            self._llm = ChatOpenAI(
+                model=self._model_name,
+                api_key=self._api_key,
+                temperature=0.0,
+                max_tokens=256,
+                model_kwargs={"response_format": {"type": "json_object"}},
+            )
+        else:
+            # Groq: no response_format support; the system prompt's JSON
+            # instruction is sufficient for llama-3.1 models.
+            self._llm = base_llm
 
     def evaluate(
         self,

@@ -27,7 +27,15 @@ from rag_eval.models.results import HallucinationResult
 @pytest.fixture
 def evaluator() -> HallucinationEvaluator:
     """HallucinationEvaluator with a test API key."""
-    ev = HallucinationEvaluator(model_name="gpt-3.5-turbo", api_key="sk-test-key")
+    with patch("rag_eval.llm_factory.get_chat_model"), \
+         patch("rag_eval.metrics.hallucination.get_settings") as ms:
+        ms.return_value = MagicMock(
+            judge_model="gpt-3.5-turbo",
+            openai_api_key=MagicMock(get_secret_value=lambda: "sk-test"),
+            llm_provider="openai",
+            groq_api_key=None,
+        )
+        ev = HallucinationEvaluator(model_name="gpt-3.5-turbo", api_key="sk-test-key")
     # Replace _llm with a MagicMock to avoid Pydantic model attribute restrictions.
     # patch.object doesn't work on Pydantic model instances; direct assignment via
     # object.__setattr__ bypasses Pydantic's field protection for testing.

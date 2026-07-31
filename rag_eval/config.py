@@ -7,7 +7,7 @@ Use `get_settings()` to access the singleton instance throughout the app.
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -28,9 +28,19 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    # ── LLM provider ────────────────────────────────────────────────────────
+    # Set LLM_PROVIDER=groq to use Groq's free tier instead of OpenAI.
+    # Groq free tier: https://console.groq.com (no credit card required).
+    llm_provider: Literal["openai", "groq"] = "openai"
+
     # ── OpenAI ─────────────────────────────────────────────────────────────
     openai_api_key: SecretStr = SecretStr("sk-placeholder")
     judge_model: str = "gpt-3.5-turbo"
+
+    # ── Groq (free-tier alternative to OpenAI) ──────────────────────────────
+    # Default model: llama-3.1-8b-instant (fast, 14,400 req/day on free tier)
+    groq_api_key: Optional[SecretStr] = None
+    groq_model: str = "llama-3.1-8b-instant"
 
     # ── Vector store ────────────────────────────────────────────────────────
     vector_store_backend: Literal["opensearch", "chroma"] = "opensearch"

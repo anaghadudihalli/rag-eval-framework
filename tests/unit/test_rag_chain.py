@@ -35,11 +35,11 @@ def _make_rag_chain(llm_response: AIMessage, docs: list[Document]) -> RAGChain:
     mock_llm.invoke.return_value = llm_response
 
     with patch("rag_eval.pipeline.rag_chain.get_settings") as ms, \
-         patch("rag_eval.pipeline.rag_chain.ChatOpenAI") as MockLLM:
+         patch("rag_eval.llm_factory.get_chat_model", return_value=mock_llm):
         ms.return_value = MagicMock(
-            openai_api_key=MagicMock(get_secret_value=lambda: "sk-test")
+            openai_api_key=MagicMock(get_secret_value=lambda: "sk-test"),
+            llm_provider="openai",
         )
-        MockLLM.return_value = mock_llm
         chain = RAGChain(retriever=mock_retriever, api_key="sk-test")
         chain._llm = mock_llm
         chain._retriever = mock_retriever
@@ -95,9 +95,10 @@ class TestExtractLogprobs:
     def _chain(self) -> RAGChain:
         """Minimal RAGChain instance with mocked internals."""
         with patch("rag_eval.pipeline.rag_chain.get_settings") as ms, \
-             patch("rag_eval.pipeline.rag_chain.ChatOpenAI"):
+             patch("rag_eval.llm_factory.get_chat_model"):
             ms.return_value = MagicMock(
-                openai_api_key=MagicMock(get_secret_value=lambda: "sk-test")
+                openai_api_key=MagicMock(get_secret_value=lambda: "sk-test"),
+                llm_provider="openai",
             )
             return RAGChain(retriever=MagicMock(), api_key="sk-test")
 
@@ -204,11 +205,11 @@ class TestRAGChainRun:
         mock_llm.invoke.return_value = ai_message
 
         with patch("rag_eval.pipeline.rag_chain.get_settings") as ms, \
-             patch("rag_eval.pipeline.rag_chain.ChatOpenAI") as MockLLM:
+             patch("rag_eval.llm_factory.get_chat_model", return_value=mock_llm):
             ms.return_value = MagicMock(
-                openai_api_key=MagicMock(get_secret_value=lambda: "sk-test")
+                openai_api_key=MagicMock(get_secret_value=lambda: "sk-test"),
+                llm_provider="openai",
             )
-            MockLLM.return_value = mock_llm
             chain = RAGChain(retriever=mock_retriever, api_key="sk-test")
             chain._llm = mock_llm
             chain._retriever = mock_retriever
@@ -236,11 +237,11 @@ class TestRAGChainRun:
         mock_llm.invoke.return_value = ai_message
 
         with patch("rag_eval.pipeline.rag_chain.get_settings") as ms, \
-             patch("rag_eval.pipeline.rag_chain.ChatOpenAI") as MockLLM:
+             patch("rag_eval.llm_factory.get_chat_model", return_value=mock_llm):
             ms.return_value = MagicMock(
-                openai_api_key=MagicMock(get_secret_value=lambda: "sk-test")
+                openai_api_key=MagicMock(get_secret_value=lambda: "sk-test"),
+                llm_provider="openai",
             )
-            MockLLM.return_value = mock_llm
             chain = RAGChain(retriever=mock_retriever, api_key="sk-test")
             chain._llm = mock_llm
             chain._retriever = mock_retriever
