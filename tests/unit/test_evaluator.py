@@ -138,8 +138,8 @@ class TestComputeAggregates:
         settings = Settings(openai_api_key="sk-test-placeholder")  # type: ignore[arg-type]
         with patch("rag_eval.pipeline.evaluator.get_settings", return_value=settings), \
              patch("rag_eval.metrics.similarity.SentenceTransformer"), \
-             patch("rag_eval.llm_factory.get_chat_model"), \
-             patch("rag_eval.llm_factory.get_chat_model"):
+             patch("rag_eval.pipeline.rag_chain.get_chat_model"), \
+             patch("rag_eval.pipeline.rag_chain.get_chat_model"):
             return EvalRunner(settings=settings)
 
     def test_empty_results_raises(self) -> None:
@@ -245,8 +245,8 @@ class TestEvaluateSample:
         mock_judge.invoke.return_value = MagicMock(content=hallucination_json)
 
         with patch("rag_eval.pipeline.evaluator.get_settings", return_value=settings), \
-             patch("rag_eval.llm_factory.get_chat_model", return_value=mock_judge), \
-             patch("rag_eval.llm_factory.get_chat_model"):
+             patch("rag_eval.metrics.hallucination.get_chat_model", return_value=mock_judge), \
+             patch("rag_eval.pipeline.rag_chain.get_chat_model"):
             runner = EvalRunner(settings=settings)
 
         return runner, mock_rag_chain
@@ -304,8 +304,8 @@ class TestEvaluateSample:
         mock_chain.run.return_value = ("answer", [doc_no_id], [], 50.0)
 
         with patch("rag_eval.pipeline.evaluator.get_settings", return_value=settings), \
-             patch("rag_eval.llm_factory.get_chat_model", return_value=mock_judge), \
-             patch("rag_eval.llm_factory.get_chat_model"):
+             patch("rag_eval.metrics.hallucination.get_chat_model", return_value=mock_judge), \
+             patch("rag_eval.pipeline.rag_chain.get_chat_model"):
             runner = EvalRunner(settings=settings)
 
         result = runner._evaluate_sample(_make_sample(0), mock_chain)
@@ -355,8 +355,8 @@ class TestEvalRunnerRun:
         with patch("rag_eval.pipeline.evaluator.get_settings", return_value=settings), \
              patch("rag_eval.pipeline.evaluator._load_golden_dataset", return_value=dataset), \
              patch("rag_eval.pipeline.evaluator.get_vector_store", return_value=mock_store), \
-             patch("rag_eval.llm_factory.get_chat_model", return_value=mock_llm), \
-             patch("rag_eval.llm_factory.get_chat_model", return_value=mock_judge):
+             patch("rag_eval.pipeline.rag_chain.get_chat_model", return_value=mock_llm), \
+             patch("rag_eval.metrics.hallucination.get_chat_model", return_value=mock_judge):
             runner = EvalRunner(settings=settings)
             return runner.run()
 
@@ -420,8 +420,8 @@ class TestEvalRunnerRun:
             with patch("rag_eval.pipeline.evaluator.get_settings", return_value=settings), \
                  patch("rag_eval.pipeline.evaluator._load_golden_dataset", return_value=dataset), \
                  patch("rag_eval.pipeline.evaluator.get_vector_store", return_value=mock_store), \
-                 patch("rag_eval.llm_factory.get_chat_model", return_value=mock_llm), \
-                 patch("rag_eval.llm_factory.get_chat_model", return_value=mock_judge):
+                 patch("rag_eval.pipeline.rag_chain.get_chat_model", return_value=mock_llm), \
+                 patch("rag_eval.metrics.hallucination.get_chat_model", return_value=mock_judge):
                 runner = EvalRunner(settings=settings)
                 report = runner.run()
 
@@ -445,8 +445,8 @@ class TestEvalRunnerRun:
             with patch("rag_eval.pipeline.evaluator.get_settings", return_value=settings), \
                  patch("rag_eval.pipeline.evaluator._load_golden_dataset", return_value=dataset), \
                  patch("rag_eval.pipeline.evaluator.get_vector_store", return_value=mock_store), \
-                 patch("rag_eval.llm_factory.get_chat_model"), \
-                 patch("rag_eval.llm_factory.get_chat_model"):
+                 patch("rag_eval.pipeline.rag_chain.get_chat_model"), \
+                 patch("rag_eval.pipeline.rag_chain.get_chat_model"):
                 runner = EvalRunner(settings=settings)
                 with pytest.raises(RuntimeError, match="All samples failed"):
                     runner.run()
@@ -481,8 +481,8 @@ class TestEvalRunnerRun:
             with patch("rag_eval.pipeline.evaluator.get_settings", return_value=settings), \
                  patch("rag_eval.pipeline.evaluator._load_golden_dataset", return_value=dataset), \
                  patch("rag_eval.pipeline.evaluator.get_vector_store", return_value=mock_store), \
-                 patch("rag_eval.llm_factory.get_chat_model", return_value=mock_llm), \
-                 patch("rag_eval.llm_factory.get_chat_model", return_value=mock_judge):
+                 patch("rag_eval.pipeline.rag_chain.get_chat_model", return_value=mock_llm), \
+                 patch("rag_eval.metrics.hallucination.get_chat_model", return_value=mock_judge):
                 runner = EvalRunner(settings=settings, thresholds=strict_thresholds)
                 report = runner.run()
 

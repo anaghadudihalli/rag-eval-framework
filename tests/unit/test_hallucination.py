@@ -27,7 +27,7 @@ from rag_eval.models.results import HallucinationResult
 @pytest.fixture
 def evaluator() -> HallucinationEvaluator:
     """HallucinationEvaluator with a test API key."""
-    with patch("rag_eval.llm_factory.get_chat_model"), \
+    with patch("rag_eval.metrics.hallucination.get_chat_model"), \
          patch("rag_eval.metrics.hallucination.get_settings") as ms:
         ms.return_value = MagicMock(
             judge_model="gpt-3.5-turbo",

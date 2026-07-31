@@ -142,8 +142,8 @@ def run_smoke_test() -> None:
             patch("rag_eval.pipeline.evaluator.get_settings", return_value=settings),
             patch("rag_eval.pipeline.evaluator._load_golden_dataset", return_value=dataset),
             patch("rag_eval.pipeline.evaluator.get_vector_store", return_value=mock_store),
-            patch("rag_eval.llm_factory.get_chat_model", return_value=mock_llm),
-            patch("rag_eval.llm_factory.get_chat_model", return_value=mock_judge_llm),
+            patch("rag_eval.pipeline.rag_chain.get_chat_model", return_value=mock_llm),
+            patch("rag_eval.metrics.hallucination.get_chat_model", return_value=mock_judge_llm),
         ):
             runner = EvalRunner(settings=settings)
             report = runner.run()
