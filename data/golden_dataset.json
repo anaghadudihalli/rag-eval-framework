@@ -1,0 +1,224 @@
+{
+  "version": "1.0",
+  "description": "Software engineering and developer tools FAQ — golden evaluation dataset. 31 queries across Git, Docker, Python, CI/CD, Testing, and REST APIs. Ground-truth answers are derived from the knowledge base documents in data/documents/.",
+  "created_at": "2026-06-18T00:00:00Z",
+  "samples": [
+    {
+      "id": "git-001-a",
+      "category": "git",
+      "query": "What is Git Flow and when should I use it?",
+      "ground_truth_answer": "Git Flow is a branching strategy that uses two main branches (main and develop) plus feature, release, and hotfix branches. Feature branches are created from develop and merged back when complete. Releases are cut from develop, and hotfixes branch from main. Git Flow is better suited for software with scheduled releases compared to GitHub Flow.",
+      "relevant_doc_ids": ["git-001"]
+    },
+    {
+      "id": "git-001-b",
+      "category": "git",
+      "query": "What is trunk-based development?",
+      "ground_truth_answer": "Trunk-Based Development is a branching strategy where all developers commit to a single trunk (main) branch multiple times per day. Feature flags control unfinished features in production. This approach reduces merge conflicts and encourages small, frequent commits. It works best with robust CI/CD and strong test coverage.",
+      "relevant_doc_ids": ["git-001"]
+    },
+    {
+      "id": "git-001-c",
+      "category": "git",
+      "query": "What branching strategy works best for small teams doing continuous deployment?",
+      "ground_truth_answer": "GitHub Flow is ideal for small teams with frequent deployments. It uses only a main branch and short-lived feature branches. Changes are deployed directly from feature branches after a pull request review.",
+      "relevant_doc_ids": ["git-001"]
+    },
+    {
+      "id": "git-002-a",
+      "category": "git",
+      "query": "What is the difference between git merge and git rebase?",
+      "ground_truth_answer": "Git merge creates a new merge commit that ties together the histories of both branches, preserving complete history. Git rebase moves or replays commits from one branch onto another, rewriting history to appear linear. Merge is non-destructive but can create a cluttered history; rebase creates a cleaner history but rewrites commit SHAs.",
+      "relevant_doc_ids": ["git-002"]
+    },
+    {
+      "id": "git-002-b",
+      "category": "git",
+      "query": "What is the golden rule of git rebase?",
+      "ground_truth_answer": "Never rebase a public branch that other developers are using. Rebase is safe for local branches or private feature branches not yet pushed, because rebase rewrites commit SHAs which can cause problems if others are working on the same branch.",
+      "relevant_doc_ids": ["git-002"]
+    },
+    {
+      "id": "git-002-c",
+      "category": "git",
+      "query": "What is interactive rebase and what can I do with it?",
+      "ground_truth_answer": "Interactive rebase (git rebase -i) allows squashing multiple commits into one, reordering commits, or editing commit messages. It is extremely useful for cleaning up a feature branch before merging.",
+      "relevant_doc_ids": ["git-002"]
+    },
+    {
+      "id": "docker-001-a",
+      "category": "docker",
+      "query": "How are Docker containers different from virtual machines?",
+      "ground_truth_answer": "Docker containers share the host OS kernel and isolate at the process level using Linux namespaces and cgroups, while virtual machines run a complete guest OS on top of a hypervisor. Containers start in seconds and use megabytes; VMs take minutes and use gigabytes. VMs provide stronger security isolation; containers are more portable and resource-efficient.",
+      "relevant_doc_ids": ["docker-001"]
+    },
+    {
+      "id": "docker-001-b",
+      "category": "docker",
+      "query": "When should I use virtual machines instead of Docker containers?",
+      "ground_truth_answer": "Use VMs when you need strong security isolation, different OS kernels, or legacy application compatibility. VMs provide hardware-level isolation whereas containers share the host OS kernel.",
+      "relevant_doc_ids": ["docker-001"]
+    },
+    {
+      "id": "docker-001-c",
+      "category": "docker",
+      "query": "What makes Docker containers portable?",
+      "ground_truth_answer": "Docker containers are portable because a Docker image built on one system runs identically on any system with Docker installed. Images can be distributed via Docker Hub and registries. Containers contain only the application and its dependencies, not a full OS, making them lightweight and consistent across environments.",
+      "relevant_doc_ids": ["docker-001"]
+    },
+    {
+      "id": "docker-002-a",
+      "category": "docker",
+      "query": "What problem do Docker multi-stage builds solve?",
+      "ground_truth_answer": "Multi-stage builds solve the problem that build tools (compilers, test frameworks, development dependencies) are needed to build an application but not to run it. Without multi-stage builds, you would either include all build tools in the production image making it large, or manage separate Dockerfiles.",
+      "relevant_doc_ids": ["docker-002"]
+    },
+    {
+      "id": "docker-002-b",
+      "category": "docker",
+      "query": "How do Docker multi-stage builds work?",
+      "ground_truth_answer": "Each FROM statement in a Dockerfile starts a new build stage. You can selectively copy artifacts from one stage to another using COPY --from=<stage>. Only the final stage is included in the output image, so build dependencies never reach production.",
+      "relevant_doc_ids": ["docker-002"]
+    },
+    {
+      "id": "docker-002-c",
+      "category": "docker",
+      "query": "What are the benefits of using multi-stage Docker builds?",
+      "ground_truth_answer": "Multi-stage builds produce dramatically smaller production images (often 10x smaller), ensure build dependencies never reach production, require only a single Dockerfile to maintain, and improve security posture because fewer packages means fewer vulnerabilities.",
+      "relevant_doc_ids": ["docker-002"]
+    },
+    {
+      "id": "python-001-a",
+      "category": "python",
+      "query": "What is uv and why would I use it instead of pip?",
+      "ground_truth_answer": "uv is a new, extremely fast (10-100x faster than pip) package manager and resolver written in Rust by Astral (creators of Ruff). It is a drop-in replacement for pip and venv, recommended for new Python projects in 2024+.",
+      "relevant_doc_ids": ["python-001"]
+    },
+    {
+      "id": "python-001-b",
+      "category": "python",
+      "query": "What is the difference between pip requirements.txt and poetry.lock?",
+      "ground_truth_answer": "pip with requirements.txt captures all installed packages and their versions via pip freeze, but does not distinguish direct from transitive dependencies. Poetry uses pyproject.toml for dependencies and generates a poetry.lock file for reproducible installs with full dependency resolution. Lock files from both should be committed for reproducible builds.",
+      "relevant_doc_ids": ["python-001"]
+    },
+    {
+      "id": "python-001-c",
+      "category": "python",
+      "query": "What is the best practice for Python dependency version pinning?",
+      "ground_truth_answer": "Pin direct dependencies with version constraints such as requests>=2.31,<3.0 rather than exact pins. Commit lock files (poetry.lock, uv.lock) for reproducible builds. Separate dev dependencies from production dependencies. Always use a virtual environment and never install to the system Python.",
+      "relevant_doc_ids": ["python-001"]
+    },
+    {
+      "id": "python-002-a",
+      "category": "python",
+      "query": "What is the purpose of from __future__ import annotations in Python?",
+      "ground_truth_answer": "The from __future__ import annotations statement defers annotation evaluation, allowing forward references in type hints and improving performance. It is a best practice to include at the top of Python files when using type hints.",
+      "relevant_doc_ids": ["python-002"]
+    },
+    {
+      "id": "python-002-b",
+      "category": "python",
+      "query": "What is the difference between mypy and pyright?",
+      "ground_truth_answer": "mypy is the original Python type checker. pyright is Microsoft's type checker, used in VS Code's Pylance extension, and is generally faster and stricter than mypy. Both perform static type analysis but are not type checkers at runtime.",
+      "relevant_doc_ids": ["python-002"]
+    },
+    {
+      "id": "python-002-c",
+      "category": "python",
+      "query": "How do I use Optional type hints in Python 3.10+?",
+      "ground_truth_answer": "In Python 3.10+, you can use the union syntax T | None instead of Optional[T]. For example, def process(value: int | None) -> list[str] is equivalent to using Optional[int] from the typing module.",
+      "relevant_doc_ids": ["python-002"]
+    },
+    {
+      "id": "cicd-001-a",
+      "category": "cicd",
+      "query": "What is the difference between Continuous Delivery and Continuous Deployment?",
+      "ground_truth_answer": "Continuous Delivery automatically prepares code for release to production after tests pass, but the deployment step may require a manual approval gate. Continuous Deployment goes further by automatically deploying every change that passes tests to production without manual intervention.",
+      "relevant_doc_ids": ["cicd-001"]
+    },
+    {
+      "id": "cicd-001-b",
+      "category": "cicd",
+      "query": "What are the key components of a GitHub Actions workflow?",
+      "ground_truth_answer": "A GitHub Actions workflow consists of: a Workflow (configurable automated process defined in YAML), Jobs (sets of steps that run on the same runner), Steps (individual tasks as shell commands or actions), Actions (reusable units of code like actions/checkout@v4), Runners (virtual machines that run jobs), and Secrets (encrypted environment variables stored in repository settings).",
+      "relevant_doc_ids": ["cicd-001"]
+    },
+    {
+      "id": "cicd-001-c",
+      "category": "cicd",
+      "query": "What is Continuous Integration and what problem does it solve?",
+      "ground_truth_answer": "Continuous Integration is the practice of merging developer changes into a shared main branch frequently, ideally multiple times per day. Each merge triggers an automated pipeline that builds the code and runs tests. The goal is to detect integration errors quickly before they compound.",
+      "relevant_doc_ids": ["cicd-001"]
+    },
+    {
+      "id": "cicd-002-a",
+      "category": "cicd",
+      "query": "How do I use a secret in a GitHub Actions workflow?",
+      "ground_truth_answer": "Secrets are accessed in GitHub Actions workflows using the expression ${{ secrets.MY_SECRET }}. They can be passed as environment variables in the env block of a job or step. Secrets are never printed in logs — they appear as ***.",
+      "relevant_doc_ids": ["cicd-002"]
+    },
+    {
+      "id": "cicd-002-b",
+      "category": "cicd",
+      "query": "What is the difference between repository secrets and environment secrets in GitHub Actions?",
+      "ground_truth_answer": "Repository secrets are encrypted values stored at the repository level. Environment secrets are scoped to a specific deployment environment (e.g., staging, production) and require the job to reference the environment. Environment secrets can require approval gates before being accessed, making them more secure for production deployments.",
+      "relevant_doc_ids": ["cicd-002"]
+    },
+    {
+      "id": "cicd-002-c",
+      "category": "cicd",
+      "query": "What is OIDC and why is it preferred over long-lived credentials in CI/CD?",
+      "ground_truth_answer": "OIDC (OpenID Connect) allows CI/CD workflows to authenticate with cloud providers without storing long-lived credentials as secrets. It is preferred because long-lived credentials are a security risk if leaked, while OIDC tokens are short-lived and scoped to specific workflows.",
+      "relevant_doc_ids": ["cicd-002"]
+    },
+    {
+      "id": "testing-001-a",
+      "category": "testing",
+      "query": "What is a pytest fixture and how do you use it?",
+      "ground_truth_answer": "A pytest fixture is a function decorated with @pytest.fixture that provides test data or sets up test state. Fixtures are requested by test functions as parameters. They can be scoped to function, class, module, or session level. They are defined in conftest.py to be shared across test files.",
+      "relevant_doc_ids": ["testing-001"]
+    },
+    {
+      "id": "testing-001-b",
+      "category": "testing",
+      "query": "How do I run only integration tests with pytest?",
+      "ground_truth_answer": "Use pytest marks to categorize tests and then filter with the -m flag. For example, mark integration tests with @pytest.mark.integration and run them with pytest -m integration. To exclude them, use pytest -m 'not integration'. Register custom marks in pyproject.toml to avoid warnings.",
+      "relevant_doc_ids": ["testing-001"]
+    },
+    {
+      "id": "testing-001-c",
+      "category": "testing",
+      "query": "What is pytest parametrize and what is it used for?",
+      "ground_truth_answer": "pytest.mark.parametrize runs the same test with multiple different inputs, reducing test code duplication. It accepts a list of argument names and a list of corresponding values or tuples. This is useful for testing functions with many valid inputs or edge cases.",
+      "relevant_doc_ids": ["testing-001"]
+    },
+    {
+      "id": "api-001-a",
+      "category": "api",
+      "query": "What HTTP status codes should I use for a REST API?",
+      "ground_truth_answer": "Use 200 OK for successful GET/PUT/PATCH, 201 Created for successful POST, 204 No Content for successful DELETE, 400 Bad Request for invalid input, 401 Unauthorized when authentication is required, 403 Forbidden when authenticated but not authorized, 404 Not Found when a resource doesn't exist, 409 Conflict for state conflicts, 422 Unprocessable Entity for validation errors, and 500 Internal Server Error for server-side failures.",
+      "relevant_doc_ids": ["api-001"]
+    },
+    {
+      "id": "api-001-b",
+      "category": "api",
+      "query": "Why is cursor-based pagination better than offset-based pagination?",
+      "ground_truth_answer": "Cursor-based pagination uses an opaque next_cursor token and is more efficient than offset/limit for large datasets. It also handles concurrent insertions correctly — offset-based pagination can skip or duplicate items if records are added or removed while paginating.",
+      "relevant_doc_ids": ["api-001"]
+    },
+    {
+      "id": "api-001-c",
+      "category": "api",
+      "query": "How should REST API URLs be designed?",
+      "ground_truth_answer": "REST API URLs should use nouns (not verbs) and resources should be plural. For example, use GET /users/123/orders rather than GET /getUserOrders?userId=123. The HTTP method (GET, POST, PUT, DELETE) expresses the action, not the URL.",
+      "relevant_doc_ids": ["api-001"]
+    },
+    {
+      "id": "api-001-d",
+      "category": "api",
+      "query": "What is the recommended approach for REST API versioning?",
+      "ground_truth_answer": "Common API versioning approaches include URL path versioning (/v1/users), request header versioning (API-Version: 2), and query parameter versioning (?version=2). URL versioning is most visible and widely adopted as it makes the version explicit in every request.",
+      "relevant_doc_ids": ["api-001"]
+    }
+  ]
+}

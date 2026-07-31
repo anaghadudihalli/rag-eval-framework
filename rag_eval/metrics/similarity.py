@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import logging
 
-import torch
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.util import cos_sim
 

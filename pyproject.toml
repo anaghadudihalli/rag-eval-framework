@@ -1,13 +1,13 @@
 [build-system]
-requires = ["setuptools>=71.0", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "rag-eval-framework"
 version = "0.1.0"
 description = "Automated RAG evaluation and observability pipeline"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [{ name = "Anagha Dudihalli" }]
 
@@ -16,6 +16,7 @@ dependencies = [
     "langchain>=0.3.0",
     "langchain-community>=0.3.0",
     "langchain-openai>=0.2.0",
+    "langchain-text-splitters>=0.3.0",
     # OpenSearch integration (matches EA production stack)
     "langchain-opensearch>=0.0.2",
     "opensearch-py>=2.4.0",
@@ -63,15 +64,15 @@ log_cli_level = "INFO"
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
-select = ["E", "F", "I", "N", "UP", "ANN"]
-ignore = ["ANN101", "ANN102"]
+target-version = "py39"
+select = ["E", "F", "I", "N", "UP"]
+ignore = []
 
 [tool.black]
 line-length = 100
-target-version = ["py311"]
+target-version = ["py39"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.9"
 strict = false
 ignore_missing_imports = true

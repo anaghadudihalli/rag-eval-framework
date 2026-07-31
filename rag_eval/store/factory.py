@@ -13,7 +13,20 @@ from __future__ import annotations
 
 import logging
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+try:
+    # langchain-huggingface is the modern package (langchain_community.embeddings.HuggingFaceEmbeddings
+    # was deprecated in LangChain 0.2.2 and will be removed in 1.0).
+    # Install with: pip install langchain-huggingface
+    from langchain_huggingface import HuggingFaceEmbeddings
+except ImportError:
+    try:
+        # Fallback: suppress the deprecation warning from the community package
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            from langchain_community.embeddings import HuggingFaceEmbeddings  # type: ignore[no-redef]
+    except ImportError:
+        from langchain.embeddings import HuggingFaceEmbeddings  # type: ignore[no-redef]
 
 from rag_eval.config import Settings, get_settings
 from rag_eval.store.base import VectorStoreBackend

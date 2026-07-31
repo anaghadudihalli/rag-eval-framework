@@ -1,0 +1,7 @@
+{
+  "id": "git-002",
+  "title": "Git Rebase vs Merge",
+  "category": "git",
+  "tags": ["git", "rebase", "merge", "history"],
+  "content": "Git offers two primary ways to integrate changes from one branch into another: merge and rebase.\n\n**Git Merge**: Creates a new 'merge commit' that ties together the histories of both branches. It preserves the complete history and is non-destructive. The downside is a potentially cluttered commit history with many merge commits in active repositories.\n\n**Git Rebase**: Moves or replays commits from one branch onto another, rewriting history to appear as if work always started from the target branch. The result is a linear, cleaner commit history. However, rebase rewrites commit SHAs, which can cause problems if others are working on the same branch.\n\n**The Golden Rule of Rebase**: Never rebase a public branch that other developers are using. Rebase is safe for local branches or private feature branches not yet pushed.\n\n**Interactive Rebase** (`git rebase -i`): Allows squashing multiple commits into one, reordering commits, or editing commit messages — extremely useful for cleaning up a feature branch before merging.\n\n**When to use each**: Use merge for integrating completed feature branches into main. Use rebase to keep a feature branch up to date with main during active development."
+}

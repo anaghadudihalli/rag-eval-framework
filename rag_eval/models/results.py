@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import List, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, Field, computed_field
@@ -137,14 +138,14 @@ class EvalReport(BaseModel):
 
     run_id: str = Field(default_factory=lambda: str(uuid4()))
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    git_sha: str | None = None
+    git_sha: Optional[str] = None
     vector_store_backend: str
     embedding_model: str
     judge_model: str
     top_k: int
     aggregate: AggregateMetrics
-    samples: list[SampleEvalResult]
-    alerts: list[str] = Field(default_factory=list)
+    samples: List[SampleEvalResult]
+    alerts: List[str] = Field(default_factory=list)
 
     @computed_field
     @property

@@ -1,0 +1,139 @@
+name: RAG Eval Pipeline
+
+on:
+  schedule:
+    # Run every Monday at 9:00 AM UTC
+    - cron: '0 9 * * 1'
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:  # allow manual trigger from GitHub UI
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  # ── Unit tests (no external services) ──────────────────────────────────────
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run unit tests
+        run: pytest tests/unit/ -v --tb=short -m "not integration and not opensearch"
+
+  # ── Integration eval with OpenSearch ───────────────────────────────────────
+  eval:
+    name: RAG Eval (OpenSearch)
+    runs-on: ubuntu-latest
+    needs: unit-tests  # only run eval if unit tests pass
+
+    services:
+      opensearch:
+        image: opensearchproject/opensearch:2.11.0
+        env:
+          discovery.type: single-node
+          DISABLE_SECURITY_PLUGIN: "true"
+          OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+          bootstrap.memory_lock: "true"
+        ports:
+          - 9200:9200
+        options: >-
+          --health-cmd="curl -sf http://localhost:9200/_cluster/health || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+          --health-start-period=30s
+
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENSEARCH_URL: http://localhost:9200
+      OPENSEARCH_INDEX: rag-eval-docs
+      VECTOR_STORE_BACKEND: opensearch
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Wait for OpenSearch
+        run: |
+          echo "Waiting for OpenSearch to be ready..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:9200/_cluster/health > /dev/null; then
+              echo "OpenSearch is ready!"
+              break
+            fi
+            echo "Attempt $i — waiting..."
+            sleep 5
+          done
+
+      - name: Ingest knowledge base
+        run: python -m rag_eval.ingest.pipeline
+
+      - name: Run integration tests (OpenSearch)
+        run: pytest tests/integration/ -v -m "integration or opensearch" --tb=short
+
+      - name: Run evaluation pipeline
+        run: python -m rag_eval.pipeline.evaluator
+        # Note: does not use --fail-on-alert here so we can always upload the report
+
+      - name: Upload eval report artifact
+        uses: actions/upload-artifact@v4
+        if: always()  # upload even if eval fails
+        with:
+          name: eval-report-${{ github.sha }}
+          path: reports/
+          retention-days: 30
+
+      - name: Check for metric degradation
+        run: |
+          # Find the latest report and check for alerts
+          latest=$(ls -t reports/*.json | head -1)
+          if [ -z "$latest" ]; then
+            echo "No report found — failing"
+            exit 1
+          fi
+          python -m rag_eval.reporting.alerts --file "$latest" --fail-on-alert
+
+  # ── Lint and formatting ────────────────────────────────────────────────────
+  lint:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install dev dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run ruff linter
+        run: ruff check rag_eval/ tests/
+
+      - name: Check black formatting
+        run: black --check rag_eval/ tests/

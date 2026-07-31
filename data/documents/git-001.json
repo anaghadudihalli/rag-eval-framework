@@ -1,0 +1,7 @@
+{
+  "id": "git-001",
+  "title": "Git Branching Strategy",
+  "category": "git",
+  "tags": ["git", "branching", "workflow", "gitflow"],
+  "content": "Git branching strategies help teams organize their development workflow. The most common strategies include:\n\n**Git Flow**: Uses two main branches (main and develop) plus feature, release, and hotfix branches. Feature branches are created from develop and merged back when complete. Releases are cut from develop, and hotfixes branch from main.\n\n**GitHub Flow**: A simpler model with only a main branch and short-lived feature branches. Changes are deployed directly from feature branches after a pull request review, making it ideal for continuous deployment.\n\n**Trunk-Based Development**: All developers commit to a single trunk (main) branch multiple times per day. Feature flags control unfinished features in production. This approach reduces merge conflicts and encourages small, frequent commits.\n\nChoosing the right strategy depends on team size, release cadence, and deployment model. GitHub Flow suits small teams with frequent deployments. Git Flow is better for software with scheduled releases. Trunk-Based Development works best with robust CI/CD and strong test coverage."
+}
